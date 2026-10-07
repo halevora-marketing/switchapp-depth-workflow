@@ -1,0 +1,58 @@
+{
+  "runtime_seconds": 8.0,
+  "goal": "Recreate the approved eight-second single-take choreography while preserving the principal subject's identity and the source timing.",
+  "reference_assets": [
+    {
+      "name": "@Image1",
+      "role": "primary identity",
+      "allowed": "face, skin, body proportions, hair, makeup, jewelry, and manicure",
+      "forbidden": "motion, camera, environment, wardrobe changes, and supporting-actor identity",
+      "primary_identity": true
+    },
+    {
+      "name": "@Image2",
+      "role": "supporting identity view",
+      "allowed": "features that agree with @Image1 from another angle",
+      "forbidden": "overriding @Image1 or defining a supporting actor"
+    },
+    {
+      "name": "@Video1",
+      "role": "source choreography",
+      "allowed": "movement, expressions, prop behavior, environment, camera, lighting, timing, and sound",
+      "forbidden": "performer identity, face, skin, body shape, or hair"
+    },
+    {
+      "name": "@Video2",
+      "role": "depth geometry",
+      "allowed": "silhouette motion, subject spacing, camera parallax, and framing continuity",
+      "forbidden": "identity, hair, skin, wardrobe, color, texture, lighting, props, people, or background appearance"
+    }
+  ],
+  "identity_lock": [
+    "Keep facial proportions, eyes, nose, lips, jawline, skin tone, age appearance, and body proportions fixed to @Image1.",
+    "Keep hair color, roots, highlights, texture, density, hairline, cut, length, part, bangs, and styling fixed to @Image1.",
+    "No face swapping, identity blending, beautification drift, skin-tone change, body reshaping, or hair transformation."
+  ],
+  "wardrobe_and_props": "Use the approved written wardrobe and props without color, construction, coverage, or left/right changes.",
+  "subjects_and_relationships": "The principal subject keeps @Image1 identity. Any supporting actor is a distinct generated person unless explicitly assigned another identity asset.",
+  "stages": [
+    {
+      "start": 0.0,
+      "end": 2.5,
+      "action": "Begin in the source opening pose and reproduce the first movement beat without a cut."
+    },
+    {
+      "start": 2.5,
+      "end": 5.5,
+      "action": "Continue the central action with the same hand, prop, and subject positions established in stage one."
+    },
+    {
+      "start": 5.5,
+      "end": 8.0,
+      "action": "Complete the final motion and hold the source ending pose through the final frame."
+    }
+  ],
+  "camera_and_lighting": "One continuous take. Match source framing, camera movement, perspective, exposure, and lighting continuity.",
+  "sound_design": "Preserve the supplied dialogue, music, effects, and ambience across the full eight seconds without new speech."
+}
+
