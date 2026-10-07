@@ -32,19 +32,31 @@ class PromptTests(unittest.TestCase):
     def test_renderer_has_stable_section_order(self):
         text = render_prompt(self.data)
         headings = [
-            "【Generation Goal】",
-            "【Reference Asset Roles】",
-            "【Identity and Appearance Lock】",
-            "【Mandatory Wardrobe and Props】",
-            "【Subjects and Relationships】",
-            "【Stage 1 0s–2.5s】",
-            "【Camera and Lighting】",
-            "【Sound Design】",
+            "Core task:",
+            "Material bindings:",
+            "Identity and appearance lock:",
+            "Mandatory wardrobe and props:",
+            "Subjects and relationships:",
+            "Shot timeline:",
+            "Environment, camera, and lighting:",
+            "Dialogue, audio, and text:",
+            "Maintain consistency:",
         ]
         positions = [text.index(heading) for heading in headings]
         self.assertEqual(positions, sorted(positions))
 
+    def test_unresolved_observation_is_rejected(self):
+        data = copy.deepcopy(self.data)
+        data["wardrobe_and_props"] = "NOT SUPPLIED"
+        codes = {issue.code for issue in validate_prompt(data)}
+        self.assertIn("content.unsupplied", codes)
+
+    def test_only_wan_style_is_accepted(self):
+        data = copy.deepcopy(self.data)
+        data["prompt_style"] = "generic"
+        codes = {issue.code for issue in validate_prompt(data)}
+        self.assertIn("style.invalid", codes)
+
 
 if __name__ == "__main__":
     unittest.main()
-

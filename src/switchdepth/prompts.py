@@ -22,6 +22,8 @@ def load_prompt(path: Path) -> dict[str, Any]:
 
 def validate_prompt(data: dict[str, Any], *, tolerance: float = 0.02) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
+    if str(data.get("prompt_style") or "").lower() != "wan":
+        issues.append(ValidationIssue("style.invalid", "prompt_style must be 'wan'"))
     runtime = _number(data.get("runtime_seconds"))
     if runtime is None or runtime <= 0:
         issues.append(ValidationIssue("runtime.invalid", "runtime_seconds must be positive"))
@@ -96,9 +98,10 @@ def validate_prompt(data: dict[str, Any], *, tolerance: float = 0.02) -> list[Va
                 f"stages end at {cursor:g}s; runtime is {runtime:g}s",
             ))
 
-    for field in ("goal", "camera_and_lighting", "sound_design"):
+    for field in ("core_task", "camera_and_environment", "dialogue_audio_and_text"):
         if not str(data.get(field) or "").strip():
             issues.append(ValidationIssue(f"{field}.missing", f"{field} is required"))
+    _reject_unknowns(data, issues)
     return issues
 
 
@@ -108,34 +111,51 @@ def render_prompt(data: dict[str, Any]) -> str:
         joined = "; ".join(f"{issue.code}: {issue.message}" for issue in issues)
         raise ValueError(f"Prompt validation failed: {joined}")
 
-    lines = ["【Generation Goal】", str(data["goal"]).strip(), "", "【Reference Asset Roles】"]
+    lines = [f"Core task: {str(data['core_task']).strip()}", "", "Material bindings:"]
     for asset in data["reference_assets"]:
-        primary = " Primary identity anchor." if asset.get("primary_identity") else ""
+        primary = " This is the primary identity anchor." if asset.get("primary_identity") else ""
         lines.append(
-            f"{asset['name']} — {asset['role']}. Allowed: {asset['allowed']}. "
-            f"Forbidden: {asset['forbidden']}.{primary}"
+            f"{asset['name']} is the {asset['role']}. It controls only {asset['allowed']}. "
+            f"It must not control {asset['forbidden']}.{primary}"
         )
-    lines.extend(["", "【Identity and Appearance Lock】"])
-    lines.extend(f"- {str(item).strip()}" for item in data["identity_lock"])
+    lines.extend(["", "Identity and appearance lock: " + " ".join(str(item).strip() for item in data["identity_lock"])])
 
     wardrobe = str(data.get("wardrobe_and_props") or "").strip()
     if wardrobe:
-        lines.extend(["", "【Mandatory Wardrobe and Props】", wardrobe])
+        lines.extend(["", f"Mandatory wardrobe and props: {wardrobe}"])
     subjects = str(data.get("subjects_and_relationships") or "").strip()
     if subjects:
-        lines.extend(["", "【Subjects and Relationships】", subjects])
+        lines.extend(["", f"Subjects and relationships: {subjects}"])
 
-    for index, stage in enumerate(data["stages"], start=1):
-        lines.extend([
-            "",
-            f"【Stage {index} {_fmt(stage['start'])}–{_fmt(stage['end'])}】",
-            str(stage["action"]).strip(),
-        ])
+    timeline = " ".join(
+        f"{_fmt(stage['start'])}–{_fmt(stage['end'])}: {str(stage['action']).strip()}"
+        for stage in data["stages"]
+    )
     lines.extend([
-        "", "【Camera and Lighting】", str(data["camera_and_lighting"]).strip(),
-        "", "【Sound Design】", str(data["sound_design"]).strip(),
+        "", f"Shot timeline: {timeline}",
+        "", f"Environment, camera, and lighting: {str(data['camera_and_environment']).strip()}",
+        "", f"Dialogue, audio, and text: {str(data['dialogue_audio_and_text']).strip()}",
     ])
+    negatives = str(data.get("maintain_consistency") or "").strip()
+    if negatives:
+        lines.extend(["", f"Maintain consistency: {negatives}"])
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _reject_unknowns(data: dict[str, Any], issues: list[ValidationIssue]) -> None:
+    markers = ("not supplied", "unknown", "todo", "tbd", "<fill", "[fill", "???")
+
+    def walk(value: Any, path: str) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                walk(child, f"{path}.{key}" if path else str(key))
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                walk(child, f"{path}[{index}]")
+        elif isinstance(value, str) and any(marker in value.lower() for marker in markers):
+            issues.append(ValidationIssue("content.unsupplied", f"{path} contains an unresolved placeholder"))
+
+    walk(data, "")
 
 
 def _number(value: Any) -> float | None:
@@ -154,4 +174,3 @@ def _contains_any(text: str, words: list[str]) -> bool:
 
 def _fmt(value: Any) -> str:
     return f"{float(value):g}s"
-

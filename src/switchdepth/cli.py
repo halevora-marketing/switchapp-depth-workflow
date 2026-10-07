@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+from .analysis import analyze_local
 from .local_depth import create_local_depth
 from .media import MediaError, extract_audio, mux_audio, probe, split_video
 from .packages import create_item, validate_package
@@ -12,11 +13,17 @@ from .prompts import load_prompt, render_prompt, validate_prompt
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="switchdepth")
+    parser = argparse.ArgumentParser(prog="wandepth")
     sub = parser.add_subparsers(dest="command", required=True)
 
     inspect = sub.add_parser("inspect", help="Inspect media with FFprobe")
     inspect.add_argument("path", type=Path)
+
+    analyze = sub.add_parser("analyze-local", help="Create a local, non-semantic evidence pack")
+    analyze.add_argument("source", type=Path)
+    analyze.add_argument("output_dir", type=Path)
+    analyze.add_argument("--samples", type=int, default=9)
+    analyze.add_argument("--scene-threshold", type=float, default=0.35)
 
     init = sub.add_parser("init", help="Create an item folder and manifest")
     init.add_argument("root", type=Path)
@@ -60,6 +67,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "inspect":
             print(json.dumps(probe(args.path), indent=2))
+        elif args.command == "analyze-local":
+            result = analyze_local(args.source, args.output_dir, samples=args.samples, scene_threshold=args.scene_threshold)
+            print(json.dumps({"analysis": str((args.output_dir / 'analysis.json').resolve()), "samples": len(result["samples"])}, indent=2))
         elif args.command == "init":
             print(create_item(args.root, title=args.title, source_url=args.source_url))
         elif args.command == "extract-audio":
@@ -98,4 +108,3 @@ def _print_issues(issues: list[object]) -> int:
     for issue in issues:
         print(f"{getattr(issue, 'code')}: {getattr(issue, 'message')}")
     return 1
-

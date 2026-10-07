@@ -1,6 +1,7 @@
 {
+  "prompt_style": "wan",
   "runtime_seconds": 8.0,
-  "goal": "Recreate the approved eight-second single-take choreography while preserving the principal subject's identity and the source timing.",
+  "core_task": "Recreate the approved eight-second single-take choreography while preserving the principal subject's identity and the source timing.",
   "reference_assets": [
     {
       "name": "@Image1",
@@ -52,7 +53,7 @@
       "action": "Complete the final motion and hold the source ending pose through the final frame."
     }
   ],
-  "camera_and_lighting": "One continuous take. Match source framing, camera movement, perspective, exposure, and lighting continuity.",
-  "sound_design": "Preserve the supplied dialogue, music, effects, and ambience across the full eight seconds without new speech."
+  "camera_and_environment": "One continuous vertical 9:16 smartphone-style take. Match source environment, framing, camera movement, perspective, exposure, and lighting continuity.",
+  "dialogue_audio_and_text": "Generate silent video for later remuxing with the approved source audio. Add no speech, captions, logos, or on-screen text.",
+  "maintain_consistency": "No cuts, identity drift, face blending, hair changes, wardrobe changes, prop swaps, extra people, duplicated limbs, temporal jumps, or background replacement."
 }
-

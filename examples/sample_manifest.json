@@ -6,13 +6,11 @@
   "expected_duration_seconds": 8.0,
   "analysis": {
     "status": "complete",
-    "file": "Full analysis.md"
+    "file": "Full analysis.md",
+    "evidence": "analysis.json"
   },
   "prompts": {
-    "seedance": "Seedance prompt.txt",
-    "kling": "Kling prompt.txt",
-    "gemini": "Gemini prompt.txt",
-    "finished": "Finished prompt.txt"
+    "wan": "WAN prompt.txt"
   },
   "media": {
     "original": "Original video.mp4",
@@ -21,4 +19,3 @@
   },
   "status": "complete"
 }
-

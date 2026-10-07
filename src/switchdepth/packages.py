@@ -25,13 +25,8 @@ def create_item(root: Path, *, title: str, source_url: str = "") -> Path:
         "title": canonical,
         "source_url": source_url,
         "expected_duration_seconds": None,
-        "analysis": {"status": "pending", "file": "Full analysis.md"},
-        "prompts": {
-            "seedance": "Seedance prompt.txt",
-            "kling": "Kling prompt.txt",
-            "gemini": "Gemini prompt.txt",
-            "finished": "Finished prompt.txt",
-        },
+        "analysis": {"status": "pending", "file": "Full analysis.md", "evidence": "analysis.json"},
+        "prompts": {"wan": "WAN prompt.txt"},
         "media": {
             "original": "Original video.mp4",
             "audio": "Original audio.m4a",
@@ -68,11 +63,12 @@ def validate_package(manifest_path: Path, *, probe_media: bool = True) -> list[P
 
     analysis = data.get("analysis") if isinstance(data.get("analysis"), dict) else {}
     _require_file(root, analysis.get("file"), "analysis.file", issues)
+    _require_file(root, analysis.get("evidence"), "analysis.evidence", issues)
     if analysis.get("status") != "complete":
         issues.append(PackageIssue("analysis.status", "analysis status must be complete"))
 
     prompts = data.get("prompts") if isinstance(data.get("prompts"), dict) else {}
-    for model in ("seedance", "kling", "gemini", "finished"):
+    for model in ("wan",):
         _require_file(root, prompts.get(model), f"prompts.{model}", issues)
 
     media = data.get("media") if isinstance(data.get("media"), dict) else {}
@@ -128,4 +124,3 @@ def _require_file(
         issues.append(PackageIssue("file.not-found", f"{label} not found: {value}"))
         return None
     return path
-

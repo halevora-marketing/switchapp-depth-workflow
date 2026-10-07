@@ -20,13 +20,8 @@ class PackageTests(unittest.TestCase):
                 "version": 1,
                 "item_key": "demo",
                 "title": "Demo",
-                "analysis": {"status": "complete", "file": "Full analysis.md"},
-                "prompts": {
-                    "seedance": "Seedance prompt.txt",
-                    "kling": "Kling prompt.txt",
-                    "gemini": "Gemini prompt.txt",
-                    "finished": "Finished prompt.txt"
-                },
+                "analysis": {"status": "complete", "file": "Full analysis.md", "evidence": "analysis.json"},
+                "prompts": {"wan": "WAN prompt.txt"},
                 "media": {
                     "original": "Original video.mp4",
                     "audio": "Original audio.m4a",
@@ -37,8 +32,7 @@ class PackageTests(unittest.TestCase):
             manifest_path = root / "manifest.json"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             for name in (
-                "Full analysis.md", "Seedance prompt.txt", "Kling prompt.txt",
-                "Gemini prompt.txt", "Finished prompt.txt", "Original video.mp4",
+                "Full analysis.md", "analysis.json", "WAN prompt.txt", "Original video.mp4",
                 "Original audio.m4a", "Depth map.mp4",
             ):
                 (root / name).write_text("placeholder", encoding="utf-8")
@@ -47,4 +41,3 @@ class PackageTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
