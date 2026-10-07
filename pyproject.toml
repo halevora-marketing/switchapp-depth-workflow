@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "switchapp-depth-workflow"
+version = "0.1.0"
+description = "Auditable depth-map, video-analysis, and reference-prompt workflow utilities."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Halevora LLC"}]
+dependencies = []
+
+[project.optional-dependencies]
+local-depth = [
+  "numpy>=1.26,<3",
+  "Pillow>=10,<12",
+  "onnxruntime>=1.18,<2",
+]
+dev = ["pytest>=8,<9"]
+
+[project.scripts]
+switchdepth = "switchdepth.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
