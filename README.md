@@ -18,6 +18,7 @@ Those semantic details must come from an operator who reviewed the exported fram
 - WAN-style prompts with explicit material bindings and forbidden transfers
 - one primary identity anchor, strict identity/hair continuity, and gap-free timestamp stages
 - WAN-only package manifests and validation
+- a server-side Pika Wan 3.0 client with uploads, balance guard, async polling, and downloads
 - tests and GitHub Actions CI
 
 ## Requirements and installation
@@ -67,6 +68,32 @@ wandepth render-prompt examples/sample_prompt.json "WAN prompt.txt"
 
 The legacy `switchdepth` command remains as an alias for existing automation.
 
+## Pika Wan 3.0 API
+
+Keep the key server-side in the environment:
+
+```bash
+$env:PIKA_API_KEY = "your_key_here"  # PowerShell
+# export PIKA_API_KEY="your_key_here" # macOS/Linux
+```
+
+Preview a request and its estimated maximum charge without uploading or submitting:
+
+```bash
+wandepth pika-wan \
+  --prompt-file "WAN prompt.txt" \
+  --image "identity.png" \
+  --video "Depth map.mp4" \
+  --audio-ref "Original audio.m4a" \
+  --resolution 1080p \
+  --ratio 9:16 \
+  --duration 10
+```
+
+After reviewing that preview, add `--submit --output "result.mp4"` to run the paid asynchronous job. The CLI checks the Pika organization balance before uploading references or submitting. It will not silently bypass that guard; `duration=auto` requires the explicit `--skip-balance-check` option because it cannot be priced locally.
+
+See [Pika Wan 3.0 API](docs/PIKA_WAN3_API.md) for the client API, status/error behavior, and production usage.
+
 ## WAN prompt contract
 
 Rendered prompts use the production-tested sequence:
@@ -103,6 +130,7 @@ Descriptive Clip Title/
 - [Independent architecture](docs/INDEPENDENCE.md)
 - [End-to-end workflow](docs/WORKFLOW.md)
 - [WAN prompt analysis](docs/PROMPT_ANALYSIS.md)
+- [Pika Wan 3.0 API](docs/PIKA_WAN3_API.md)
 - [Migration from SwitchApp](docs/SWITCHAPP_INTEGRATION.md)
 - [Production lessons](docs/LESSONS_FROM_RUNS.md)
 - [Contributing](CONTRIBUTING.md)
