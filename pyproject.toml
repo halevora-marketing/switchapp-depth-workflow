@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wan-depth-workflow"
-version = "0.3.0"
-description = "Independent depth-map, evidence-analysis, WAN prompting, and Pika Wan 3.0 API utilities."
+version = "0.2.0"
+description = "Independent local depth-map, evidence-analysis, and WAN prompt workflow utilities."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
